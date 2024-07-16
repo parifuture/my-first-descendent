@@ -35,9 +35,6 @@ export function Weapons({ weapon }: { weapon: SelectWeapon }) {
       <TableCell className="hidden md:table-cell">
         {weapon.weaponTier}
       </TableCell>
-      {/* <TableCell className="hidden md:table-cell">
-        {weapon.availableAt.toLocaleDateString()}
-      </TableCell> */}
       <TableCell>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

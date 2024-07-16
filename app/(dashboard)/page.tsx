@@ -9,7 +9,6 @@ export default async function ProductsPage({
 }: {
   searchParams: { q: string; offset: string };
 }) {
-  const search = searchParams.q ?? '';
   const offset = searchParams.offset ?? 0;
   const { weapons, newOffset, totalWeapons } = await getWeapons(Number(offset));
 

@@ -190,7 +190,8 @@ export async function getWeaponDetailById(weaponId: string): Promise<{
   };
 }
 
-export type GetWeapons = typeof getWeapons;
+export type GetWeapons = ReturnType<typeof getWeapons>;
+export type GetWeaponDetail = Awaited<GetWeapons>['weapons'][number];
 export type SelectWeapon = typeof weapons.$inferSelect;
 export type GetWeaponDetailById = typeof getWeaponDetailById;
 
