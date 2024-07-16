@@ -16,7 +16,7 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Product } from './product';
-import { SelectProduct } from '@/lib/db';
+import { SelectWeapon } from '@/lib/db';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,7 @@ export function ProductsTable({
   offset,
   totalProducts
 }: {
-  products: SelectProduct[];
+  products: SelectWeapon[];
   offset: number;
   totalProducts: number;
 }) {
@@ -70,7 +70,7 @@ export function ProductsTable({
           </TableHeader>
           <TableBody>
             {products.map((product) => (
-              <Product key={product.id} product={product} />
+              <Product key={product.weaponId} product={product} />
             ))}
           </TableBody>
         </Table>
