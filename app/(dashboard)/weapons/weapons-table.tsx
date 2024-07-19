@@ -16,42 +16,75 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Weapon } from './weapon';
-import { GetWeaponDetail } from '@/lib/db';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 export function WeaponsTable({
-  weapons: weapons,
+  weapons,
+  weaponTypes,
   offset,
   totalWeapons
 }: {
-  weapons: GetWeaponDetail[];
+  weapons: any[];
+  weaponTypes: any[];
   offset: number;
   totalWeapons: number;
 }) {
-  let router = useRouter();
-  let productsPerPage = 5;
-  const [filteredWeapons, setFilteredWeapons] = useState(weapons);
+  const router = useRouter();
+  const productsPerPage = 5;
+  const [weaponTypeFilter, setWeaponTypeFilter] = useState(['all']);
+  const [weaponData, setWeaponData] = useState(weapons);
 
-  // useEffect(() => {
-  //   if (weaponType === 'all') {
-  //     setFilteredWeapons(weapons);
-  //   } else {
-  //     setFilteredWeapons(
-  //       weapons.filter((weapon) => weapon.weaponType === weaponType)
-  //     );
-  //   }
-  //   setFilteredWeapons(weapons);
-  // }, [weapons]);
+  useEffect(() => {
+    async function filterWeapons() {
+      const response = await fetch(
+        `/api/weapons?offset=${offset}&types=${weaponTypeFilter.join(',')}`
+      );
+      const filteredWeapons = await response.json();
+      setWeaponData(filteredWeapons.weapons);
+    }
+    filterWeapons();
+  }, [weaponTypeFilter, offset]);
+
+  function arrayDifference<T>(arr1: T[], arr2: T[]): T[] {
+    return arr1.filter((item) => !arr2.includes(item));
+  }
+
+  function removeAllOccurrences<T>(arr: T[], value: T): T[] {
+    return arr.filter((item) => item !== value);
+  }
+
+  const weaponTypeFilterComponent = (
+    <ToggleGroup
+      type="multiple"
+      value={weaponTypeFilter}
+      onValueChange={(newValue) => {
+        const difference = arrayDifference(newValue, weaponTypeFilter);
+        if (difference && difference[0] === 'all') {
+          setWeaponTypeFilter(['all']);
+        } else {
+          const filterWithoutAll = removeAllOccurrences(newValue, 'all');
+          setWeaponTypeFilter(filterWithoutAll);
+        }
+      }}
+    >
+      <ToggleGroupItem value="all">All</ToggleGroupItem>
+      {weaponTypes.map((weaponType) => (
+        <ToggleGroupItem key={weaponType.value} value={weaponType.value}>
+          {weaponType.label}
+        </ToggleGroupItem>
+      ))}
+    </ToggleGroup>
+  );
 
   function prevPage() {
     router.back();
   }
 
   function nextPage() {
-    router.push(`/?offset=${offset}`, { scroll: false });
+    router.push(`/?offset=${offset + productsPerPage}`, { scroll: false });
   }
 
   return (
@@ -63,6 +96,8 @@ export function WeaponsTable({
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {weaponTypeFilterComponent}
+
         <Table>
           <TableHeader>
             <TableRow>
@@ -83,8 +118,8 @@ export function WeaponsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {weapons.map((filteredProduct: GetWeaponDetail) => (
-              <Weapon key={filteredProduct.weaponId} weapon={filteredProduct} />
+            {weaponData.map((weapon: any) => (
+              <Weapon key={weapon.weaponId} weapon={weapon} />
             ))}
           </TableBody>
         </Table>
@@ -94,27 +129,26 @@ export function WeaponsTable({
           <div className="text-xs text-muted-foreground">
             Showing{' '}
             <strong>
-              {Math.min(offset - productsPerPage, totalWeapons) + 1}-{offset}
+              {Math.min(offset, totalWeapons) + 1}-
+              {Math.min(offset + productsPerPage - 1, totalWeapons)}
             </strong>{' '}
             of <strong>{totalWeapons}</strong> products
           </div>
           <div className="flex">
             <Button
-              formAction={prevPage}
+              onClick={prevPage}
               variant="ghost"
               size="sm"
-              type="submit"
-              disabled={offset === productsPerPage}
+              disabled={offset === 0}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Prev
             </Button>
             <Button
-              formAction={nextPage}
+              onClick={nextPage}
               variant="ghost"
               size="sm"
-              type="submit"
-              disabled={offset + productsPerPage > totalWeapons}
+              disabled={offset + productsPerPage >= totalWeapons}
             >
               Next
               <ChevronRight className="ml-2 h-4 w-4" />

@@ -12,7 +12,7 @@ import {
   serial,
   primaryKey
 } from 'drizzle-orm/pg-core';
-import { count, eq, ilike } from 'drizzle-orm';
+import { count, eq, ilike, inArray } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { table } from 'console';
 
@@ -190,10 +190,59 @@ export async function getWeaponDetailById(weaponId: string): Promise<{
   };
 }
 
-export type GetWeapons = ReturnType<typeof getWeapons>;
+export async function getWeaponTypes(): Promise<
+  { label: string; value: string }[]
+> {
+  const weaponTypes = await db
+    .selectDistinct({ weaponType: weapons.weaponType })
+    .from(weapons)
+    .orderBy(weapons.weaponType);
+  return weaponTypes.map((row) => {
+    const label = row.weaponType;
+    const value = label.replace(/_\w/g, (m) => m[1].toUpperCase());
+    return { label, value };
+  });
+}
+
+export async function getWeaponsByTypes(offset: number, weaponTypes: string[]) {
+  if (offset === null) {
+    return { weapons: [], newOffset: null, totalWeapons: 0 };
+  }
+  let totalWeapons = await db.select({ count: count() }).from(weapons);
+  let moreWeapons = await db
+    .select({
+      weaponId: weapons.weaponId,
+      weaponName: weapons.weaponName,
+      imageUrl: weapons.imageUrl,
+      weaponType: weapons.weaponType,
+      weaponTier: weapons.weaponTier,
+      weaponRoundsType: weapons.weaponRoundsType,
+      weaponPerkAbilityName: weaponPerks.weaponPerkAbilityName,
+      weaponPerkAbilityDescription: weaponPerks.weaponPerkAbilityDescription
+    })
+    .from(weapons)
+    .leftJoin(weaponPerks, eq(weapons.weaponId, weaponPerks.weaponId))
+    .where(inArray(weapons.weaponType, weaponTypes))
+    .limit(5)
+    .offset(offset);
+
+  let newOffset = moreWeapons.length >= 5 ? offset + 5 : null;
+
+  return {
+    weapons: moreWeapons,
+    newOffset,
+    totalWeapons: totalWeapons[0].count
+  };
+}
+
+export type GetWeapons = Awaited<ReturnType<typeof getWeapons>>;
 export type GetWeaponDetail = Awaited<GetWeapons>['weapons'][number];
 export type SelectWeapon = typeof weapons.$inferSelect;
-export type GetWeaponDetailById = typeof getWeaponDetailById;
+export type GetWeaponDetailById = Awaited<
+  ReturnType<typeof getWeaponDetailById>
+>;
+export type GetWeaponTypes = Awaited<ReturnType<typeof getWeaponTypes>>;
+export type GetWeaponsByTypes = Awaited<ReturnType<typeof getWeapons>>;
 
 export const insertWeapon = createInsertSchema(weapons);
 export const insertWeaponPerk = createInsertSchema(weaponPerks);
