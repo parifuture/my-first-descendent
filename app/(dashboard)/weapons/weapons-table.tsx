@@ -1,5 +1,5 @@
 'use client';
-
+import { useEffect, useState } from 'react';
 import {
   TableHead,
   TableRow,
@@ -15,23 +15,36 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { Product } from './product';
+import { Weapon } from './weapon';
 import { GetWeaponDetail } from '@/lib/db';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-export function ProductsTable({
-  products,
+export function WeaponsTable({
+  weapons: weapons,
   offset,
-  totalProducts
+  totalWeapons
 }: {
-  products: GetWeaponDetail[];
+  weapons: GetWeaponDetail[];
   offset: number;
-  totalProducts: number;
+  totalWeapons: number;
 }) {
   let router = useRouter();
   let productsPerPage = 5;
+  const [filteredWeapons, setFilteredWeapons] = useState(weapons);
+
+  // useEffect(() => {
+  //   if (weaponType === 'all') {
+  //     setFilteredWeapons(weapons);
+  //   } else {
+  //     setFilteredWeapons(
+  //       weapons.filter((weapon) => weapon.weaponType === weaponType)
+  //     );
+  //   }
+  //   setFilteredWeapons(weapons);
+  // }, [weapons]);
 
   function prevPage() {
     router.back();
@@ -70,8 +83,8 @@ export function ProductsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product: GetWeaponDetail) => (
-              <Product key={product.weaponId} weapon={product} />
+            {weapons.map((filteredProduct: GetWeaponDetail) => (
+              <Weapon key={filteredProduct.weaponId} weapon={filteredProduct} />
             ))}
           </TableBody>
         </Table>
@@ -81,9 +94,9 @@ export function ProductsTable({
           <div className="text-xs text-muted-foreground">
             Showing{' '}
             <strong>
-              {Math.min(offset - productsPerPage, totalProducts) + 1}-{offset}
+              {Math.min(offset - productsPerPage, totalWeapons) + 1}-{offset}
             </strong>{' '}
-            of <strong>{totalProducts}</strong> products
+            of <strong>{totalWeapons}</strong> products
           </div>
           <div className="flex">
             <Button
@@ -101,7 +114,7 @@ export function ProductsTable({
               variant="ghost"
               size="sm"
               type="submit"
-              disabled={offset + productsPerPage > totalProducts}
+              disabled={offset + productsPerPage > totalWeapons}
             >
               Next
               <ChevronRight className="ml-2 h-4 w-4" />

@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import {
   db,
   weapons,
@@ -10,10 +11,18 @@ import {
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const data = JSON.parse(fs.readFileSync('weapons.json', 'utf8'));
+  // Log the current working directory
+  console.log('Current working directory:', process.cwd());
+
+  // Use an absolute path to the JSON file
+  const filePath = path.join(__dirname, 'weapons.json');
+  console.log('Reading file from path:', filePath);
+
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
   try {
     for (const weapon of data) {
+      console.log('Processing weapon:', weapon);
       // Insert weapon data
       await db
         .insert(weapons)
@@ -26,7 +35,7 @@ export async function GET() {
           weaponRoundsType: weapon.weapon_rounds_type
         })
         .onConflictDoNothing();
-
+      console.log('Inserted weapon:');
       // Insert base stats
       for (const stat of weapon.base_stat) {
         await db
@@ -38,6 +47,7 @@ export async function GET() {
           })
           .onConflictDoNothing();
       }
+      console.log('Inserted base stats:');
 
       // Insert firearm attack values
       for (const levelData of weapon.firearm_atk) {
@@ -52,6 +62,7 @@ export async function GET() {
             })
             .onConflictDoNothing();
         }
+        console.log('Inserted firearm attack values:');
       }
 
       // Insert weapon perks if they exist
@@ -68,6 +79,7 @@ export async function GET() {
           })
           .onConflictDoNothing();
       }
+      console.log('Inserted weapon perks:');
     }
 
     return new Response('Data seeding completed successfully', { status: 200 });

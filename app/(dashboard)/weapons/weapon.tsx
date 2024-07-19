@@ -10,10 +10,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { SelectWeapon } from '@/lib/db';
-// import { deleteProduct } from './actions';
+import { GetWeaponDetail } from '@/lib/db';
 
-export function Weapons({ weapon }: { weapon: SelectWeapon }) {
+export function Weapon({ weapon }: { weapon: GetWeaponDetail }) {
   return (
     <TableRow>
       <TableCell className="hidden sm:table-cell">
@@ -31,7 +30,7 @@ export function Weapons({ weapon }: { weapon: SelectWeapon }) {
           {weapon.weaponType}
         </Badge>
       </TableCell>
-      <TableCell className="hidden md:table-cell">{`$${weapon.weaponRoundsType}`}</TableCell>
+      <TableCell className="hidden md:table-cell">{`${weapon.weaponRoundsType}`}</TableCell>
       <TableCell className="hidden md:table-cell">
         {weapon.weaponTier}
       </TableCell>

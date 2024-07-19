@@ -18,7 +18,7 @@ export function Product({ weapon }: { weapon: GetWeaponDetail }) {
       <TableCell className="hidden sm:table-cell">
         <Image
           alt="Product image"
-          className="aspect-square rounded-md object-cover"
+          className="aspect-square rounded-md object-contain"
           height="64"
           src={weapon.imageUrl}
           width="64"
@@ -30,7 +30,7 @@ export function Product({ weapon }: { weapon: GetWeaponDetail }) {
           {weapon.weaponType}
         </Badge>
       </TableCell>
-      <TableCell className="hidden md:table-cell">{`$${weapon.weaponRoundsType}`}</TableCell>
+      <TableCell className="hidden md:table-cell">{`${weapon.weaponRoundsType}`}</TableCell>
       <TableCell className="hidden md:table-cell">
         {weapon.weaponTier}
       </TableCell>
@@ -44,10 +44,9 @@ export function Product({ weapon }: { weapon: GetWeaponDetail }) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuItem>
               <form>
-                <button type="submit">Delete</button>
+                <button type="submit">View Details</button>
               </form>
             </DropdownMenuItem>
           </DropdownMenuContent>
