@@ -208,7 +208,10 @@ export async function getWeaponsByTypes(offset: number, weaponTypes: string[]) {
   if (offset === null) {
     return { weapons: [], newOffset: null, totalWeapons: 0 };
   }
-  let totalWeapons = await db.select({ count: count() }).from(weapons);
+  let totalWeapons = await db
+    .select({ count: count() })
+    .from(weapons)
+    .where(inArray(weapons.weaponType, weaponTypes));
   let moreWeapons = await db
     .select({
       weaponId: weapons.weaponId,

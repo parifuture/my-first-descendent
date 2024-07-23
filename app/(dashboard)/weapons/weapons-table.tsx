@@ -25,12 +25,14 @@ export function WeaponsTable({
   weapons,
   weaponTypes,
   offset,
-  totalWeapons
+  totalWeapons,
+  selectedWeaponType
 }: {
   weapons: any[];
   weaponTypes: any[];
   offset: number;
   totalWeapons: number;
+  selectedWeaponType: string;
 }) {
   const router = useRouter();
   const productsPerPage = 5;
@@ -38,12 +40,19 @@ export function WeaponsTable({
   const [weaponData, setWeaponData] = useState(weapons);
 
   useEffect(() => {
+    if (selectedWeaponType === 'all') {
+      setWeaponTypeFilter(['all']);
+    } else {
+      setWeaponTypeFilter([selectedWeaponType]);
+    }
+  }, [selectedWeaponType]);
+  useEffect(() => {
     async function filterWeapons() {
       const response = await fetch(
-        `/api/weapons?offset=${offset}&types=${weaponTypeFilter.join(',')}`
+        `/api/weapons?offset=${offset}&weaponTypes=${weaponTypeFilter.join(',')}`
       );
       const filteredWeapons = await response.json();
-      setWeaponData(filteredWeapons.weapons);
+      setWeaponData(filteredWeapons.weapons.weapons);
     }
     filterWeapons();
   }, [weaponTypeFilter, offset]);
@@ -118,9 +127,10 @@ export function WeaponsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {weaponData.map((weapon: any) => (
-              <Weapon key={weapon.weaponId} weapon={weapon} />
-            ))}
+            {weaponData.length &&
+              weaponData.map((weapon: any) => (
+                <Weapon key={weapon.weaponId} weapon={weapon} />
+              ))}
           </TableBody>
         </Table>
       </CardContent>

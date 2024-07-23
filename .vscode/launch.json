@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Next: Node",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "dev"],
+      "remoteRoot": "/Users/partiwari/personal-projects/my-first-descendent",
+      "sourceMaps": true,
+      "console": "integratedTerminal"
+    }
+  ]
+}

@@ -1,15 +1,15 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { File, PlusCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { getWeapons, getWeaponTypes } from '@/lib/db';
 import { WeaponsTable } from './weapons-table';
 
-export default async function ProductsPage({
+export default async function WeaponsPage({
   searchParams
 }: {
-  searchParams: { q: string; offset: string };
+  searchParams: { weaponTypes: string; offset: string };
 }) {
   const offset = searchParams.offset ?? 0;
+  const qWeaponTypes = searchParams.weaponTypes;
+
   const { weapons, newOffset, totalWeapons } = await getWeapons(Number(offset));
   const weaponTypes = await getWeaponTypes();
 
@@ -24,8 +24,9 @@ export default async function ProductsPage({
         <WeaponsTable
           weapons={weapons}
           weaponTypes={weaponTypes}
-          offset={newOffset ?? 0}
+          offset={parseInt(offset)}
           totalWeapons={totalWeapons}
+          selectedWeaponType={qWeaponTypes ?? 'all'}
         />
       </TabsContent>
     </Tabs>
